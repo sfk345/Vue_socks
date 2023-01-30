@@ -9,7 +9,15 @@
 </head>
 <body>
 <div id="app">
-    <h1>{{ product }}</h1>
+    <div class="product">
+        <div class="product-image">
+            <img v-bind:alt="altText" v-bind:src="image">
+        </div>
+        <div class="product-info">
+            <h1>{{ product }}</h1>
+            <p>{{ description }}</p>
+            <a href="https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks">{{ link }}</a>
+        </div>
 </div>
 <script defer src="js/vue.min.js"></script>
 <script  defer src="js/main.js"></script>
