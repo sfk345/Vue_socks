@@ -9,36 +9,7 @@
 </head>
 <body>
 <div id="app">
-    <div class="product">
-        <div class="product-image">
-            <img :alt="altText" :src="image">
-        </div>
-        <div class="product-info">
-            <h1 v-if="inventory > 100">{{ sale }}</h1>
-            <h1 v-else>{{ title }}</h1>
-            <p>{{ description }}</p>
-            <a v-bind:href="link">More products like this.</a>
-            <p v-if="inventory > 10">In Stock</p>
-            <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
-            <p v-else :class="{LineThrough : inStock}">Out of stock</p>
-            <span v-if="inventory > 100">Sale</span>
-            <ul>
-                <li v-for="detail in details">{{detail}}</li>
-            </ul>
-            <div v-for="variant in variants" :key="variant.variantID">
-                <p>{{ variant.variantColor }}</p>
-            </div>
-            <ul v-for="size in sizes">
-                <li>{{ size }}</li>
-            </ul>
-            <div class="cart">
-                <p>Cart({{cart}})</p>
-            </div>
-            <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
-            <button v-on:click="outCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Out of cart</button>
-            <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantID" :style="{ backgroundColor:variant.variantColor }" @mouseover="updateProduct(index)">
-            </div>
-        </div>
+    <product :premium="premium"></product>
 </div>
 <script defer src="js/vue.min.js"></script>
 <script  defer src="js/main.js"></script>
