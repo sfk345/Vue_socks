@@ -19,7 +19,7 @@
             <a href="https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks">{{ link }}</a>
             <p v-if="inventory > 10">In Stock</p>
             <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
-            <p v-else>Out of stock</p>
+            <p v-else :class="{textLineThrough : inStock}">Out of stock</p>
             <span v-if="inventory > 100">onSale</span>
             <ul>
                 <li v-for="detail in details">{{detail}}</li>
@@ -33,12 +33,9 @@
             <div class="cart">
                 <p>Cart({{cart}})</p>
             </div>
-            <button v-on:click="addToCart">Add to cart</button>
+            <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
             <button v-on:click="outCart">Out of cart</button>
-            <div v-for="variant in variants">
-                <p @mousedown="updateProduct(variant.variantIMG)">
-                    {{ variant.variantColor }}
-                </p>
+            <div class="color-box" v-for="variant in variants" :key="variant.variantID" :style="{ backgroundColor:variant.variantColor }" @mouseover="updateProduct(variant.variantIMG)">
             </div>
         </div>
 </div>
