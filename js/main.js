@@ -18,10 +18,11 @@ Vue.component('product', {
              <a :href="link">More products like this</a>
              <p v-if="inStock">In stock</p>
              <p v-else :class="{LineThrough: !inStock}">Out of Stock</p>
-             <ul>
-                <li v-for="detail in details">{{ detail }}</li>
+             <ul v-for="productDetail in productDetails">
+                <li>{{productDetail}}</li>
              </ul>
              <p>Shipping: {{ shipping }}</p>
+             <p>User is premium: {{premium}}</p>
              <div
                 class="color-box"
                 v-for="(variant, index) in variants"
@@ -112,13 +113,20 @@ Vue.component('product', {
             } else {
                 return 2.99
             }
+        },
+        productDetails() {
+            if (this.details) {
+                return this.details;
+            } else {
+                return "Detailed information is missing"
+            }
         }
     }
 })
 let app = new Vue({
     el: '#app',
     data: {
-        premium: false
+        premium: true
     }
 })
 
