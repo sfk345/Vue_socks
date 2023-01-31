@@ -18,9 +18,10 @@ Vue.component('product', {
              <a :href="link">More products like this</a>
              <p v-if="inStock">In stock</p>
              <p v-else :class="{LineThrough: !inStock}">Out of Stock</p>
-             <ul v-for="productDetail in productDetails">
-                <li>{{productDetail}}</li>
-             </ul>
+             <p>{{productDetails}}</p>
+             <ul v-for="size in sizes">
+                <li>{{ size }}</li>
+            </ul>
              <p>Shipping: {{ shipping }}</p>
              <p>User is premium: {{premium}}</p>
              <div
@@ -31,9 +32,7 @@ Vue.component('product', {
                 @mouseover="updateProduct(index)">
              </div>
               
-             <div class="cart">
-                <p>Cart({{ cart }})</p>
-             </div>
+
     
              <button
              v-on:click="addToCart"
@@ -61,7 +60,6 @@ Vue.component('product', {
             altText: "A pair of socks",
             onSale: "on Sale",
             inventory: 1000,
-            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
                 {
                     variantId: 2234,
@@ -76,18 +74,19 @@ Vue.component('product', {
                     variantQuantity: 0
                 }
             ],
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
             cart: 0
         }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart',
+            this.variants[this.selectedVariant].variantId);
         },
         outOfCart() {
-            if (this.cart >= 1){
-                this.cart -= 1
-            }
+            this.$emit('out-of-cart',
+            this.variants[this.selectedVariant].variantId);
         },
         updateProduct(index) {
             this.selectedVariant = index;
@@ -117,7 +116,7 @@ Vue.component('product', {
         productDetails() {
             if (this.details) {
                 return this.details;
-            } else {
+            } else if (!this.details){
                 return "Detailed information is missing"
             }
         }
@@ -126,7 +125,16 @@ Vue.component('product', {
 let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        updateCartTwo(id) {
+            this.cart.pop(id);
+        },
     }
 })
 
