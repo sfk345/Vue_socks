@@ -1,3 +1,47 @@
+let eventBus = new Vue()
+
+Vue.component('product-tabs', {
+    template: `
+       <div>
+        <ul>
+         <span class="tab" 
+             :class="{activeTab: selectedTab === tab}"
+             v-for="(tab, index) in tabs"
+             @click="selectedTab = tab">
+             {{ tab }}</span>
+        </ul>
+        <div v-show="selectedTab === 'Reviews'">
+            <p v-if="!reviews.length">There are no reviews yet</p>
+            <ul>
+                <li v-for="review in reviews">
+                    <p>{{review.name}}</p>
+                    <p>Rating: {{review.rating}}</p>
+                    <p>{{review.review}}</p>
+                </li>
+            </ul>
+        </div>
+        <div v-show="selectedTab === 'Make a Review'">
+            <product-review></product-review>
+        </div>
+       </div>
+    `,
+    props: {
+        reviews: {
+            type: Array,
+            required: false
+        }
+    },
+    data() {
+        return {
+            tabs: ['Reviews', 'Make a Review'],
+            selectedTab: 'Reviews'
+        }
+    },
+})
+
+
+
+
 Vue.component('product-review', {
     template: `
    <form class="review-form" @submit.prevent="onSubmit">
@@ -58,7 +102,7 @@ Vue.component('product-review', {
                     rating: this.rating,
                     recommend: this.recommend
                 }
-                this.$emit('review-submitted', productReview)
+                eventBus.$emit('review-submitted', productReview)
                 this.name = null
                 this.review = null
                 this.rating = null
@@ -76,12 +120,6 @@ Vue.component('product-review', {
 
 
 Vue.component('product', {
-    props: {
-        premium: {
-            type: Boolean,
-            required: true
-        }
-    },
     template: `
     <div class="product">
         <div class="product-image">
@@ -89,13 +127,12 @@ Vue.component('product', {
         </div>
     
         <div class="product-info">
-             <h1 v-if="inventory > 100">{{ sale }}</h1>
-             <h1 v-else>{{ title }}</h1>
+        
+             <h1>{{ title }}</h1>
              <p>{{description}}</p>
              <a :href="link">More products like this</a>
              <p v-if="inStock">In stock</p>
              <p v-else :class="{LineThrough: !inStock}">Out of Stock</p>
-             <p>{{productDetails}}</p>
              <ul v-for="size in sizes">
                 <li>{{ size }}</li>
             </ul>
@@ -122,21 +159,18 @@ Vue.component('product', {
                 Out of cart
              </button>
         </div>
-        <div>
-                <h2>Reviews</h2>
-                <p v-if="!reviews.length">There are no reviews yet.</p>
-                <ul>
-                    <li v-for="review in reviews">
-                        <p>{{review.name}}</p>
-                        <p>Rating: {{review.rating}}</p>
-                        <p>{{review.review}}</p>
-                        <p>{{review.recommend}}</p>
-                    </li>
-                </ul>
-        </div>
-        <product-review @review-submitted="addReview"></product-review>
+        <product-tabs :reviews="reviews"></product-tabs>
     </div>
  `,
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        },
+        cart: {
+            type: Number
+        }
+    },
     data() {
         return {
             product: "Socks",
@@ -145,7 +179,6 @@ Vue.component('product', {
             link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
             selectedVariant: 0,
             altText: "A pair of socks",
-            onSale: "on Sale",
             inventory: 1000,
             variants: [
                 {
@@ -163,7 +196,6 @@ Vue.component('product', {
             ],
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 0,
             reviews: []
         }
     },
@@ -178,12 +210,7 @@ Vue.component('product', {
         },
         updateProduct(index) {
             this.selectedVariant = index;
-            console.log(index);
         },
-        addReview(productReview) {
-            this.reviews.push(productReview)
-        }
-
     },
     computed: {
         title() {
@@ -196,7 +223,7 @@ Vue.component('product', {
             return this.variants[this.selectedVariant].variantQuantity
         },
         sale(){
-            return this.brand + ' ' + this.product + ' ' + this.onSale
+            return this.variants[this.selectedVariant].variantQuantity
         },
         shipping() {
             if (this.premium) {
@@ -205,15 +232,30 @@ Vue.component('product', {
                 return 2.99
             }
         },
-        productDetails() {
-            if (this.details) {
-                return this.details;
-            } else if (!this.details){
-                return "Detailed information is missing"
-            }
-        }
-    }
+    },
+    mounted(){
+        eventBus.$on('review-submitted', productReview => {
+            this.reviews.push(productReview)
+        })
+    },
 })
+
+Vue.component('product-details', {
+    template: `
+    <div class="product-details">
+        <span>Details:</span>
+        <ul v-for="detail in details">
+            <li>{{ detail }}</li>
+        </ul>   
+    </div>
+    `,
+    props: {
+        details: {
+            type: Array,
+        }
+    },
+})
+
 let app = new Vue({
     el: '#app',
     data: {
