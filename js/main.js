@@ -1,5 +1,42 @@
 let eventBus = new Vue()
 
+Vue.component('product-information', {
+    template: `
+       <div>
+        <ul>
+         <span class="tab" 
+             :class="{activeTab: selectedTab === tab}"
+             v-for="(tab, index) in tabs"
+             @click="selectedTab = tab">
+             {{ tab }}</span>
+        </ul>
+        <div v-show="selectedTab === 'Shipping'">
+            <p>{{shipping}}</p>
+        </div>
+        <div v-show="selectedTab === 'Details'">
+            <product-details :details="details"></product-details>
+        </div>
+       </div>
+    `,
+    props: {
+        shipping: {
+            type: Function,
+            required: false
+        },
+        details: {
+            type: Array,
+            required: true
+        }
+    },
+    data() {
+        return {
+            tabs: ['Shipping', 'Details'],
+            selectedTab: 'Shipping'
+        }
+    },
+})
+
+
 Vue.component('product-tabs', {
     template: `
        <div>
@@ -17,6 +54,7 @@ Vue.component('product-tabs', {
                     <p>{{review.name}}</p>
                     <p>Rating: {{review.rating}}</p>
                     <p>{{review.review}}</p>
+                    <p>{{review.recommend}}</p>
                 </li>
             </ul>
         </div>
@@ -145,7 +183,7 @@ Vue.component('product', {
                 :style="{ backgroundColor:variant.variantColor }"
                 @mouseover="updateProduct(index)">
              </div>
-
+             <product-information :shipping="shipping" :details="details"></product-information>
              <button
              v-on:click="addToCart"
              :disabled="!inStock"
